@@ -1,16 +1,7 @@
+import streamlit as st
 import joblib
 import os
-
-# 1. Get the directory where app.py is located
-base_dir = os.path.dirname(__file__)
-
-# 2. Join it with your model file name safely
-model_path = os.path.join(base_dir, 'rf_model.joblib')
-
-# 3. Load the model
-model = joblib.load(model_path)import streamlit as st
 import pandas as pd
-import joblib
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
@@ -21,13 +12,19 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Load the trained model and dataset
+# 2. Setup safe paths relative to this file's folder (mlproject1)
+base_dir = os.path.dirname(__file__)
+model_path = os.path.join(base_dir, 'rf_model.joblib')
+data_path = os.path.join(base_dir, 'cleaned_data.csv')
+
+# 3. Load the trained model and dataset
 @st.cache_resource
 def load_assets():
-    # Load your Random Forest model
-    model = joblib.load("rf_model.joblib")
-    # Load your raw dataset to get the text names for your drop-down list
-    df = pd.read_csv("cleaned_data.csv")
+    # Load your Random Forest model dynamically
+    model = joblib.load(model_path)
+    
+    # Load your raw dataset dynamically
+    df = pd.read_csv(data_path)
     
     # Recreate the LabelEncoder exactly how you did in cell [22] of EDA.ipynb
     encoder = LabelEncoder()
@@ -44,7 +41,7 @@ except Exception as e:
     st.error(f"Error loading project assets: {e}")
     st.stop()
 
-# 3. Custom Styling (CSS Layout)
+# 4. Custom Styling (CSS Layout)
 st.markdown("""
     <style>
     .main-title {
@@ -66,7 +63,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 4. App Layout Split (Columns)
+# 5. App Layout Split (Columns)
 col1, col2 = st.columns([1, 1.2], gap="large")
 
 # Left Column: Brand Identity Visuals
@@ -104,7 +101,7 @@ with col2:
     st.write("")
     predict_btn = st.button("💲 Predict", use_container_width=True)
 
-    # 5. Prediction Logic Execution
+    # 6. Prediction Logic Execution
     if predict_btn:
         try:
             # Match cell [22]: Encode the text choice into the matching number using your LabelEncoder object
@@ -125,7 +122,7 @@ with col2:
             # Run inference
             predicted_value = model.predict(input_features)[0]
             
-            # Output display formatting (In Lakhs/Crores if your target variable was divided, otherwise raw value)
+            # Output display formatting 
             st.markdown(
                 f'<div class="prediction-text">Predicted Price: Lakhs/Rs. {predicted_value:,.2f}</div>', 
                 unsafe_allow_html=True
