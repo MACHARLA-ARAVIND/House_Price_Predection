@@ -1,4 +1,14 @@
-import streamlit as st
+import joblib
+import os
+
+# 1. Get the directory where app.py is located
+base_dir = os.path.dirname(__file__)
+
+# 2. Join it with your model file name safely
+model_path = os.path.join(base_dir, 'rf_model.joblib')
+
+# 3. Load the model
+model = joblib.load(model_path)import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
